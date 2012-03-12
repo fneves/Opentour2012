@@ -1,30 +1,70 @@
-var app =  new function () {
-    var myOptions = {
-        center: new google.maps.LatLng(-34.397, 150.644),
-        zoom: 8,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-    var me = this;
-    var appMap;
-    var markers = [];
+    var app =  new function () {
+        var myOptions = {
+            center: new google.maps.LatLng(-34.397, 150.644),
+            zoom: 8,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var me = this;
+        var appMap;
+        var currentPosition;
 
+        return {
 
+            init : function() {
+                this.updateCurrentPosition();
+                me.appMap = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
+            },
 
-    return {
-        init : function() {
-            me.appMap = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
-        },
+            putMarker: function(image) {
+                    this.updateCurrentPosition();
+                    var post = document.getElementById("textToPost").value||"Default";
+                    var spot = new google.maps.Marker({
+                        position: me.currentPosition,
+                        map: me.appMap,
+                        icon: image,
+                        title : post
+                    });
+                    var contentString = '<div id="content">'+
+                    '<div id="siteNotice">'+
+                    '</div>'+
+                    '<h2 id="firstHeading" class="firstHeading">Example marker</h2>'+
+                    '<div id="bodyContent">'+
+                    '<p><b>The example marker with post text:</b>,'+
+                    '<p>post</p> '+
+                    '</div>'+
+                    '</div>'
 
-        putMarker: function(image, lat, lon) {
-            var myLatLng = new google.maps.LatLng(lat, lon);
-            var spot = new google.maps.Marker({
-                position: myLatLng,
-                map: me.appMap,
-                icon: image
-            });
-            markers.push(spot);
+                    var infowindow = new google.maps.InfoWindow({
+                        content: contentString
+                    });
+                    google.maps.event.addListener(spot, 'click', function() {
+                        infowindow.open(me.appMap,spot);
+                    });
+                    me.appMap.setCenter(me.currentPosition);
+            } ,
+
+            updateCurrentPosition : function() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function( position ){
+                             // Log that this is the initial position.
+                            console.log( "Position Found" );
+                            me.currentPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                        },
+                        function( error ){
+                            console.log( "Something went wrong: ", error );
+                            me.currentPosition =   new google.maps.LatLng(-34.397, 150.644);
+                        },
+                        {
+                            timeout: (5 * 1000),
+                            maximumAge: (1000 * 60 * 15),
+                            enableHighAccuracy: true,
+                            //bypass to chrome dev
+                        } );
+                } else {
+                    alert('I guess this browser does not support geolocation!')
+                }
+            }
         }
-    }
 
-}();
+    }();
 
