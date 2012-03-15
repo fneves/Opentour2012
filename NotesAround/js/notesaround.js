@@ -48,7 +48,8 @@
                     navigator.geolocation.getCurrentPosition(function( position ){
                              // Log that this is the initial position.
                             console.log( "Position Found" );
-                            me.currentPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                            me.currentPosition = new google.maps.LatLng(position.coords.latitude,
+                                position.coords.longitude);
                         },
                         function( error ){
                             console.log( "Something went wrong: ", error );
@@ -57,7 +58,7 @@
                         {
                             timeout: (5 * 1000),
                             maximumAge: (1000 * 60 * 15),
-                            enableHighAccuracy: true,
+                            enableHighAccuracy: true
                             //bypass to chrome dev
                         } );
                 } else {
