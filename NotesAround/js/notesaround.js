@@ -33,6 +33,7 @@ var app =  new function () {
                                                   icon: image,
                                                   title : post
                                               });
+            $.post("http://notesaround.code-monkeys.info/api/note", { 'loc': [me.currentPosition.lat(),me.currentPosition.lon()] });
             var contentString = '<div id="content">'+
                 '<div id="siteNotice">'+
                 '</div>'+
