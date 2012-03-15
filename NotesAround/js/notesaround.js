@@ -58,7 +58,7 @@
                         {
                             timeout: (5 * 1000),
                             maximumAge: (1000 * 60 * 15),
-                            enableHighAccuracy: true,
+                            enableHighAccuracy: true
                             //bypass to chrome dev
                         } );
                 } else {
