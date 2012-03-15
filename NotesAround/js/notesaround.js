@@ -9,48 +9,62 @@ var app =  new function () {
     var currentPosition;
 
     return {
-
         init : function() {
+            var that = this;
             this.updateCurrentPosition();
             me.appMap = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
 
-            $.PeriodicalUpdater({
-                                    url : 'api/notes',
-                                    method: 'get',
-                                    maxTimeout: 6000
+
+            $.PeriodicalUpdater('/api/notes', {
+                                    method: 'GET',
+                                    type: 'json',
+                                    maxTimeout: 5000,
+                                    runatonce: true
                                 },
-                                function(data){
-                                    console.log(data);
+                                function (notes, success, xhr, handle) {
+                                    for (note in notes) {
+                                        that.displayNote(notes[note]);
+                                    }
                                 });
+        },
+
+        displayNote: function(note) {
+            var that = this;
+            var spot = new google.maps.Marker({
+                                                  position: new google.maps.LatLng(note.loc[0],
+                                                                                   note.loc[1]),
+                                                  map: me.appMap,
+                                                  icon: 'img/icon.png',
+                                                  title : 'Bananinhas'
+                                              });
+
+            that.complementNote(spot);
+        },
+
+        complementNote: function (spot) {
+            var contentString = '<div id="content">' +
+                '<div id="siteNotice">' +
+                '</div>' +
+                '<h2 id="firstHeading" class="firstHeading">Example marker</h2>' +
+                '<div id="bodyContent">' +
+                '<p><b>The example marker with post text:</b>,' +
+                '<p>post</p> ' +
+                '</div>' +
+                '</div>'
+
+            var infowindow = new google.maps.InfoWindow({content:contentString});
+
+            google.maps.event.addListener(spot, 'click', function () {
+                infowindow.open(me.appMap, spot);
+            });
         },
 
         putMarker: function(image) {
             this.updateCurrentPosition();
             var post = document.getElementById("textToPost").value||"Default";
-            var spot = new google.maps.Marker({
-                                                  position: me.currentPosition,
-                                                  map: me.appMap,
-                                                  icon: image,
-                                                  title : post
-                                              });
-            $.post("http://notesaround.code-monkeys.info/api/note", { 'loc': [me.currentPosition.lat(),me.currentPosition.lon()] });
-            var contentString = '<div id="content">'+
-                '<div id="siteNotice">'+
-                '</div>'+
-                '<h2 id="firstHeading" class="firstHeading">Example marker</h2>'+
-                '<div id="bodyContent">'+
-                '<p><b>The example marker with post text:</b>,'+
-                '<p>post</p> '+
-                '</div>'+
-                '</div>'
 
-            var infowindow = new google.maps.InfoWindow({
-                                                            content: contentString
-                                                        });
-            google.maps.event.addListener(spot, 'click', function() {
-                infowindow.open(me.appMap,spot);
-            });
-            me.appMap.setCenter(me.currentPosition);
+            $.post("/api/note", 'note=' + JSON.stringify({ 'loc': [me.currentPosition.lat(), me.currentPosition.lng()] }));
+
         } ,
 
         updateCurrentPosition : function() {
