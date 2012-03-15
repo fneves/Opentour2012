@@ -48,7 +48,8 @@
                     navigator.geolocation.getCurrentPosition(function( position ){
                              // Log that this is the initial position.
                             console.log( "Position Found" );
-                            me.currentPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                            me.currentPosition = new google.maps.LatLng(position.coords.latitude,
+                                position.coords.longitude);
                         },
                         function( error ){
                             console.log( "Something went wrong: ", error );
